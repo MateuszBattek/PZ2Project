@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "XAHmLnPTujesBuqUEufjLxtdJmUAab7gWTDPBMuqnrw+OsyrWk4x5t+//NIVBJNs8AItf3kgFhulpAF9KcztVw==",
+  "dgSpecHash": "T2jyV89h/em/GeqMY8nSaQbj6ZLcF4i0WaYrMS6Rs4Fv2CZkxyGIitIJkdYmYoHDGJ42bTk8JzJ9JzkTdmQTIA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\andre\\Desktop\\studia\\sem4\\PZ2\\lab09\\MvcPracownicy\\MvcPracownicy.csproj",
+  "projectFilePath": "C:\\Users\\andre\\Documents\\GitHub\\PZ2Project\\MvcPracownicy.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\andre\\.nuget\\packages\\microsoft.data.sqlite\\7.0.4\\microsoft.data.sqlite.7.0.4.nupkg.sha512",
     "C:\\Users\\andre\\.nuget\\packages\\microsoft.data.sqlite.core\\7.0.4\\microsoft.data.sqlite.core.7.0.4.nupkg.sha512",

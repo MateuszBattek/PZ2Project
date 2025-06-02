@@ -31,7 +31,7 @@ public class DB : Controller{
         return View();
     }
 
-    public IActionResult WpiszDane()
+    public IActionResult DodajUzytkownika()
     {
         if (!HttpContext.Session.Keys.Contains("login_status") || HttpContext.Session.GetString("login_status") != "Zalogowano")
             return RedirectToAction("Logowanie", "IO");
@@ -39,11 +39,12 @@ public class DB : Controller{
     }
 
     [HttpPost]
-    public IActionResult WpiszDane(IFormCollection form)
+    public IActionResult DodajUzytkownika(IFormCollection form)
     {
         string pesel = form["pesel"].ToString();
         string imie = form["imie"].ToString();
         string nazwisko = form["nazwisko"].ToString();
+        
         var connectionStringBuilder = new SqliteConnectionStringBuilder();
         connectionStringBuilder.DataSource = "./baza.db";
         using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))

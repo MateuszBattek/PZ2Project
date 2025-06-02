@@ -18,11 +18,11 @@ builder.Services.AddSession(options =>
 });
 //KONIEC
 
-bool first_run = File.Exists("baza.db");            // Create tables and admin if first run
+bool first_run = File.Exists("Models/baza.db");            // Create tables and admin if first run
 if (!first_run)
 {
     var connectionStringBuilder = new SqliteConnectionStringBuilder();
-    connectionStringBuilder.DataSource = "./baza.db";
+    connectionStringBuilder.DataSource = "./Models/baza.db";
     using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
     {
         connection.Open();
@@ -30,20 +30,11 @@ if (!first_run)
         SqliteCommand createTableCmd = connection.CreateCommand();
         createTableCmd.CommandText =
             "CREATE TABLE \"Uzytkownicy\" ("
-            + "\"Id_uzytkownika\"	INTEGER PRIMARY KEY,"
-            + "\"Login\"	TEXT PRIMARY KEY,"
+            + "\"Id_uzytkownika\"	INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + "\"Login\"	TEXT NOT NULL,"
             + "\"Haslo\"	TEXT NOT NULL,"
-            + "\"Nr_tel\"	TEXT,"
-            + "\"Email\"	TEXT NOT NULL,"
-            + "\"Rola\"	    TEXT NOT NULL);";
-        createTableCmd.ExecuteNonQuery();
-
-        createTableCmd.CommandText =
-            "CREATE TABLE \"Dane_kontaktowe\" ("
-            + "\"Id_kontaktowe\"	INTEGER PRIMARY KEY,"
-            + "\"Id_uzytkownika\"	INTEGER FOREIGN KEY,"
-            + "\"Login\"	TEXT PRIMARY KEY,"
-            + "\"Haslo\"	TEXT NOT NULL,"
+            + "\"Imie\"	TEXT NOT NULL,"
+            + "\"Nazwisko\"	TEXT NOT NULL,"
             + "\"Nr_tel\"	TEXT,"
             + "\"Email\"	TEXT NOT NULL,"
             + "\"Rola\"	    TEXT NOT NULL);";
@@ -51,8 +42,7 @@ if (!first_run)
 
         createTableCmd.CommandText =
             "CREATE TABLE \"Adresy\" ("
-            + "\"Id_adresu\"	INTEGER PRIMARY KEY,"
-            + "\"Id_uzytkownika\"	    INTEGER FOREIGN KEY,"
+            + "\"Id_adresu\"	INTEGER PRIMARY KEY AUTOINCREMENT,"
             + "\"Kraj\"	    TEXT NOT NULL,"
             + "\"Wojewodztwo\"	    TEXT NOT NULL,"
             + "\"Kod_pocztowy\"	    TEXT NOT NULL,"
@@ -64,25 +54,28 @@ if (!first_run)
 
         createTableCmd.CommandText =
             "CREATE TABLE \"Platnosci\" ("
-            + "\"Id_platnosci\"	INTEGER PRIMARY KEY,"
+            + "\"Id_platnosci\"	INTEGER PRIMARY KEY AUTOINCREMENT,"
             + "\"Id_uzytkownika\"	INTEGER FOREIGN KEY,"
             + "\"Id_oferty\"	INTEGER FOREIGN KEY,"
+            + "\"Kwota\"	INTEGER FOREIGN KEY,"
             + "\"Data\" TEXT NOT NULL);";
         createTableCmd.ExecuteNonQuery();
 
         createTableCmd.CommandText =
             "CREATE TABLE \"Oferty\" ("
-            + "\"Id_oferty\"	INTEGER PRIMARY KEY,"
+            + "\"Id_oferty\"	INTEGER PRIMARY KEY AUTOINCREMENT,"
             + "\"Nazwa\"	TEXT NOT NULL,"
             + "\"Opis\"	TEXT NOT NULL,"
-            + "\"Cena\"	REAL NOT NULL);";
+            + "\"Cena\"	INTEGER NOT NULL);";
         createTableCmd.ExecuteNonQuery();
 
         createTableCmd.CommandText =
-            "CREATE TABLE \"Rabaty\" ("
-            + "\"Id_rabatu\"	INTEGER PRIMARY KEY,"
-            + "\"Lata\"	TEXT NOT NULL,"
-            + "\"rabat\"	REAL NOT NULL);";
+            "CREATE TABLE \"Umowy\" ("
+            + "\"Id_umowy\"	INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + "\"Id_uzytkownika\"	INTEGER FOREIGN KEY,"
+            + "\"Id_oferty\"	INTEGER FOREIGN KEY,"
+            + "\"Id_adresu\"	INTEGER FOREIGN KEY,"
+            + "\"Data_zawarcia\"	TEXT NOT NULL);";
         createTableCmd.ExecuteNonQuery();
 
         string admin_hash = "";
@@ -96,16 +89,8 @@ if (!first_run)
         SqliteCommand insertCmd = connection.CreateCommand();
         insertCmd.CommandText =
         "INSERT INTO Uzytkownicy"
-        + "(Login, Haslo)"
-        + "VALUES (\"admin\", +\"" + admin_hash + "\");";
-        insertCmd.ExecuteNonQuery();
-
-        insertCmd = connection.CreateCommand();
-        insertCmd.CommandText =
-        "INSERT INTO Dane"
-        + "(Pesel, Imie, Nazwisko)"
-        + "VALUES (\"12345678901\", \"Jan\", \"Kowalski\"),"
-        + "(\"22345678901\", \"Jan\", \"Kowalski\");";
+        + "(Login, Haslo, Imie, Nazwisko, Email, Rola)"
+        + "VALUES (\"admin\", +\"" + admin_hash + "\", \"Jan\", \"Kowalski\", \"admin@change.this\", \"Admin\");";
         insertCmd.ExecuteNonQuery();
     }
 }

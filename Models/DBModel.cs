@@ -10,7 +10,7 @@ using System.Text;
 public class DBModel
 {
     private readonly string connectionString = "Models/database.db";
-    public void AddUser(string login, string haslo, string imie, string nazwisko, string nr_tel, string email, string rola)
+    public void AddUser(User user, string password)
     {
         var connectionStringBuilder = new SqliteConnectionStringBuilder();
         connectionStringBuilder.DataSource = connectionString;
@@ -19,7 +19,7 @@ public class DBModel
             string password_hash = "";
             using (SHA256 sha256 = SHA256.Create())
             {
-                byte[] inputBytes = Encoding.UTF8.GetBytes(haslo);
+                byte[] inputBytes = Encoding.UTF8.GetBytes(password);
                 byte[] hashBytes = sha256.ComputeHash(inputBytes);
                 password_hash = Convert.ToHexString(hashBytes);
             }
@@ -28,14 +28,33 @@ public class DBModel
             insertCmd.CommandText = @"
                 INSERT INTO Uzytkownicy (Login, Haslo, Imie, Nazwisko, Nr_tel, Email, Rola)
                 VALUES (@login, @haslo, @imie, @nazwisko, @nrTel, @email, @rola)";
-            insertCmd.Parameters.AddWithValue("@login", login);
-            insertCmd.Parameters.AddWithValue("@haslo", password_hash);
-            insertCmd.Parameters.AddWithValue("@imie", imie);
-            insertCmd.Parameters.AddWithValue("@nazwisko", nazwisko);
-            insertCmd.Parameters.AddWithValue("@nrTel", nr_tel);
-            insertCmd.Parameters.AddWithValue("@email", email);
-            insertCmd.Parameters.AddWithValue("@rola", rola);
+            insertCmd.Parameters.AddWithValue("@login", user.Login);
+            insertCmd.Parameters.AddWithValue("@haslo", password);
+            insertCmd.Parameters.AddWithValue("@imie", user.Imie);
+            insertCmd.Parameters.AddWithValue("@nazwisko", user.Nazwisko);
+            insertCmd.Parameters.AddWithValue("@nrTel", user.Nr_tel);
+            insertCmd.Parameters.AddWithValue("@email", user.Email);
+            insertCmd.Parameters.AddWithValue("@rola", user.Rola);
+
             insertCmd.ExecuteNonQuery();
+        }
+    }
+
+    /// <summary>
+    /// Usuwa uzytkownika
+    /// </summary>
+    /// <param name="login"></param>
+    public void DeleteUser(string login)
+    {
+        var connectionStringBuilder = new SqliteConnectionStringBuilder();
+        connectionStringBuilder.DataSource = connectionString;
+        using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+        {
+            connection.Open();
+            SqliteCommand deleteCmd = connection.CreateCommand();
+            deleteCmd.CommandText = "DELETE FROM Uzytkownicy WHERE Login = @login";
+            deleteCmd.Parameters.AddWithValue("@login", login);
+            deleteCmd.ExecuteNonQuery();
         }
     }
 
@@ -45,30 +64,32 @@ public class DBModel
     /// <param name="login"></param>
     /// <param name="haslo"></param>
     /// <returns>
-    /// 0 - nie ma użytkownika w bazie
-    /// 1 - złe hasło
-    /// 10 - zalogowany zwykły użytkownik
-    /// 20 - zalogowany admin
+    /// User lub null jeśli go nie ma/jest złe hasło
     /// </returns>
-    public int LogIn(string login, string haslo)
+    public User? LogIn(string login, string haslo)
     {
         string hashZBazy = "";
-        string rola = "";
+        User? user = null;
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
             var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = "SELECT Haslo, Rola FROM Uzytkownicy WHERE Login = @login";
+            selectCmd.CommandText = "SELECT Haslo, Imie, Nazwisko, Nr_tel, Email, Rola FROM Uzytkownicy WHERE Login = @login";
             selectCmd.Parameters.AddWithValue("@login", login);
             using (var reader = selectCmd.ExecuteReader())
             {
                 if (reader.Read())
                 {
                     hashZBazy = reader.GetString(0);
-                    rola = reader.GetString(1);
+                    string imie = reader.GetString(1);
+                    string nazwisko = reader.GetString(2);
+                    string nr_tel = reader.GetString(3);
+                    string email = reader.GetString(4);
+                    string rola = reader.GetString(5);
+                    user = new User(login, imie, nazwisko, nr_tel, email, rola);
                 }
                 else
-                    return 0; // login nie istnieje
+                    return null;
             }
         }
         string hashWpisanego = "";
@@ -79,9 +100,9 @@ public class DBModel
             hashWpisanego = Convert.ToHexString(hashBytes);
         }
         if (hashWpisanego.Equals(hashZBazy, StringComparison.OrdinalIgnoreCase))
-            return rola.ToLower() == "admin" ? 20 : 10;
+            return user;
         else
-            return 1;
-
+            return null;
     }
+
 }

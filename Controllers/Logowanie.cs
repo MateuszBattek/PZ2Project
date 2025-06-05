@@ -29,8 +29,9 @@ public class IO : Controller
         string login = form["login"].ToString();
         string haslo = form["haslo"].ToString();
 
-        User? user = LogIn(login, haslo);
-        bool zalogowany = false;
+        User? user = DBModel.LogIn(login, haslo);
+        bool zalogowany = user != null;
+        
         string login_status;
         if(zalogowany)
             login_status = "Zalogowano";

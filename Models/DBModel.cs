@@ -9,7 +9,7 @@ using System.Text;
 /// </summary>
 public class DBModel
 {
-    private readonly string connectionString = "Models/database.db";
+    private static readonly string connectionString = "Models/database.db";
     public static void AddUser(User user, string password)
     {
         var connectionStringBuilder = new SqliteConnectionStringBuilder();

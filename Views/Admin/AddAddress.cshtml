@@ -1,0 +1,31 @@
+<form asp-action="AddAddress" method="post">
+    <label for="kraj">Kraj: </label>
+    <input name="kraj" id="kraj" class="form-control" required />
+    <br>
+
+    <label for="wojewodztwo">Województwo: </label>
+    <input name="wojewodztwo" id="wojewodztwo" class="form-control" required />
+    <br>
+
+    <label for="kod_pocztowy">Kod pocztowy: </label>
+    <input name="kod_pocztowy" id="kod_pocztowy" class="form-control" pattern="\d{2}-\d{3}" title="Format: 12-345" required />
+    <br>
+
+    <label for="miasto">Miasto: </label>
+    <input name="miasto" id="miasto" class="form-control" required />
+    <br>
+
+    <label for="ulica">Ulica: </label>
+    <input name="ulica" id="ulica" class="form-control" required />
+    <br>
+
+    <label for="numer_domu">Numer domu: </label>
+    <input name="numer_domu" id="numer_domu" class="form-control" required />
+    <br>
+
+    <label for="numer_mieszkania">Numer mieszkania: </label>
+    <input name="numer_mieszkania" id="numer_mieszkania" class="form-control"/>
+    <br>
+
+    <input type="submit" value="Zatwierdź" class="btn btn-primary" />
+</form>

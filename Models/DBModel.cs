@@ -140,6 +140,8 @@ public class DBModel
     
     /// <summary>
     /// Metoda zwraca dług użytkownika (tyle ile musi zapłacić)
+    /// uznaje, ze trzeba zapłacić, jeśli zmieni się miesiąc
+    /// (nawet zawarcie umowy 2020.05.31 do data bieżąca 2020.06.01)
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
@@ -150,20 +152,22 @@ public class DBModel
         {
             connection.Open();
             var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = "SELECT Login, Imie, Nazwisko, Nr_tel, Email, Rola FROM Uzytkownicy";
+            selectCmd.CommandText = @"
+            SELECT 
+                ((strftime('%Y', 'now') - strftime('%Y', RMD)) * 12 +
+                (strftime('%m', 'now') - strftime('%m', RMD))) * O.Kwota AS Suma
+            FROM Umowy U
+            JOIN Oferty O on U.Id_oferty = O.Id_oferty
+            WHERE Login = @login;
+            GROUP BY U.Id_oferty
+            ";
+            selectCmd.Parameters.AddWithValue("@login", user.Login);
+
             using (var reader = selectCmd.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    User? user = null;
-                    string login = reader.GetString(0);
-                    string imie = reader.GetString(1);
-                    string nazwisko = reader.GetString(2);
-                    string nr_tel = reader.GetString(3);
-                    string email = reader.GetString(4);
-                    string rola = reader.GetString(5);
-                    user = new User(login, imie, nazwisko, nr_tel, email, rola);
-                    users.Add(user);
+                    debt += reader.GetInt32(0);
                 }
             }
         }

@@ -333,19 +333,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ndres\\.nuget\\packages\\": {}
+    "C:\\Users\\andre\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ndres\\Documents\\GitHub\\PZ2Project\\MvcPracownicy.csproj",
+      "projectUniqueName": "C:\\Users\\andre\\Documents\\GitHub\\PZ2Project\\MvcPracownicy.csproj",
       "projectName": "MvcPracownicy",
-      "projectPath": "C:\\Users\\ndres\\Documents\\GitHub\\PZ2Project\\MvcPracownicy.csproj",
-      "packagesPath": "C:\\Users\\ndres\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ndres\\Documents\\GitHub\\PZ2Project\\obj\\",
+      "projectPath": "C:\\Users\\andre\\Documents\\GitHub\\PZ2Project\\MvcPracownicy.csproj",
+      "packagesPath": "C:\\Users\\andre\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\andre\\Documents\\GitHub\\PZ2Project\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ndres\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\andre\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net7.0"

@@ -105,4 +105,70 @@ public class DBModel
             return null;
     }
 
+    /// <summary>
+    /// Pobiera wszystkich uzytkowników
+    /// </summary>
+    /// <returns>
+    /// zwraca List<User> z wszystkimi użytkownikami
+    /// </returns>
+    public List<User> GetUsers()
+    {
+        List<User> users = new List<User>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = "SELECT Login, Imie, Nazwisko, Nr_tel, Email, Rola FROM Uzytkownicy";
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    User? user = null;
+                    string login = reader.GetString(0);
+                    string imie = reader.GetString(1);
+                    string nazwisko = reader.GetString(2);
+                    string nr_tel = reader.GetString(3);
+                    string email = reader.GetString(4);
+                    string rola = reader.GetString(5);
+                    user = new User(login, imie, nazwisko, nr_tel, email, rola);
+                    users.Add(user);
+                }
+            }
+        }
+        return users;
+    }
+    
+    /// <summary>
+    /// Metoda zwraca dług użytkownika (tyle ile musi zapłacić)
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public int userDebt(User user)
+    {
+        int debt = 0;
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = "SELECT Login, Imie, Nazwisko, Nr_tel, Email, Rola FROM Uzytkownicy";
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    User? user = null;
+                    string login = reader.GetString(0);
+                    string imie = reader.GetString(1);
+                    string nazwisko = reader.GetString(2);
+                    string nr_tel = reader.GetString(3);
+                    string email = reader.GetString(4);
+                    string rola = reader.GetString(5);
+                    user = new User(login, imie, nazwisko, nr_tel, email, rola);
+                    users.Add(user);
+                }
+            }
+        }
+        return debt;
+    }
+
+
 }

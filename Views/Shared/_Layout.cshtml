@@ -20,16 +20,13 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="IO" asp-action="Logowanie">Logowanie</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="LogIn">Logowanie</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="IO" asp-action="SecretData">Secret Data</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="LogOut">Wyloguj</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="IO" asp-action="Logout">Wyloguj</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="DB" asp-action="WyswietlDane">Wyświetl Dane</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="ShowPanel">Admin Panel</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="DB" asp-action="WpiszDane">Wpisz Dane</a>

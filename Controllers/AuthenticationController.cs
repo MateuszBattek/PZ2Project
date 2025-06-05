@@ -8,11 +8,11 @@ using System.Security.Cryptography;
 using Microsoft.Data.Sqlite;
 using MvcPracownicy.Models;
 using System.Text;
-public class IO : Controller
+public class AuthenticationController : Controller
 {
 
     //Obsługa metody GET 
-    public IActionResult Logowanie()
+    public IActionResult LogIn()
     {
         if (!HttpContext.Session.Keys.Contains("Id_uzytkownika"))
             ViewData["login_status"] = "Nie zalogowano";
@@ -24,7 +24,7 @@ public class IO : Controller
 
     //Obsługa metody POST
     [HttpPost] 
-    public IActionResult Logowanie(IFormCollection form)
+    public IActionResult LogIn(IFormCollection form)
     {
         string login = form["login"].ToString();
         string haslo = form["haslo"].ToString();
@@ -48,9 +48,12 @@ public class IO : Controller
     }
 
 
-    public IActionResult Logout()
+    public IActionResult LogOut()
     {
-        HttpContext.Session.SetString("login_status", "Nie zalogowano");
-        return RedirectToAction("Logowanie");
+        if (HttpContext.Session.Keys.Contains("Id_uzytkownika"))
+            HttpContext.Session.Remove("Id_uzytkownika");
+        if (HttpContext.Session.Keys.Contains("Rola"))
+            HttpContext.Session.Remove("Rola");
+        return RedirectToAction("LogIn", "Authentication");
     }
 }

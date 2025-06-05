@@ -12,9 +12,7 @@ public class DBModel
     private static readonly string connectionString = "Data Source=Models/baza.db";
     public static void AddUser(User user, string password)
     {
-        var connectionStringBuilder = new SqliteConnectionStringBuilder();
-        connectionStringBuilder.DataSource = connectionString;
-        using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+        using (var connection = new SqliteConnection(connectionString))
         {
             string password_hash = "";
             using (SHA256 sha256 = SHA256.Create())
@@ -42,9 +40,7 @@ public class DBModel
 
     public static User? GetUser(string user_id)
     {
-        var connectionStringBuilder = new SqliteConnectionStringBuilder();
-        connectionStringBuilder.DataSource = connectionString;
-        using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+        using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
             SqliteCommand selectCmd = connection.CreateCommand();
@@ -75,9 +71,7 @@ public class DBModel
     /// <param name="login"></param>
     public static void DeleteUser(string login)
     {
-        var connectionStringBuilder = new SqliteConnectionStringBuilder();
-        connectionStringBuilder.DataSource = connectionString;
-        using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+        using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
             SqliteCommand deleteCmd = connection.CreateCommand();

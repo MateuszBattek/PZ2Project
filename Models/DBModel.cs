@@ -34,7 +34,29 @@ public class DBModel
             insertCmd.Parameters.AddWithValue("@Nr_tel", user.Nr_tel);
             insertCmd.Parameters.AddWithValue("@Email", user.Email);
             insertCmd.Parameters.AddWithValue("@Rola", user.Rola);
-            
+
+            insertCmd.ExecuteNonQuery();
+        }
+    }
+
+    public static void ChangeUserData(User user, int id_uzytkownika)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            SqliteCommand insertCmd = connection.CreateCommand();
+            insertCmd.CommandText =
+    "UPDATE Uzytkownicy SET Imie=@Imie, Nazwisko=@Nazwisko, Nr_tel=@Nr_tel, Email=@Email " +
+    "WHERE (Id_uzytkownika=@Id_uzytkownika);";
+
+            insertCmd.Parameters.AddWithValue("@Imie", user.Imie);
+            insertCmd.Parameters.AddWithValue("@Nazwisko", user.Nazwisko);
+            insertCmd.Parameters.AddWithValue("@Nr_tel", user.Nr_tel);
+            insertCmd.Parameters.AddWithValue("@Email", user.Email);
+            insertCmd.Parameters.AddWithValue("@Id_uzytkownika", id_uzytkownika);
+
+            Console.WriteLine(user.Imie + " " + user.Nazwisko + " " + user.Nr_tel + " " + user.Email + " " + id_uzytkownika);
+
             insertCmd.ExecuteNonQuery();
         }
     }

@@ -40,6 +40,35 @@ public class DBModel
         }
     }
 
+    public static User? GetUser(string user_id)
+    {
+        var connectionStringBuilder = new SqliteConnectionStringBuilder();
+        connectionStringBuilder.DataSource = connectionString;
+        using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+        {
+            connection.Open();
+            SqliteCommand selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = "SELECT Id_uzytkownika, Login, Imie, Nazwisko, Nr_tel, Email, Rola FROM Uzytkownicy WHERE Id_uzytkownika = @id_uzytkownika";
+            selectCmd.Parameters.AddWithValue("@id_uzytkownika", user_id);
+            using (SqliteDataReader reader = selectCmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    int Id_uzytkownika = reader.GetInt32(0);
+                    string Login = reader.GetString(1);
+                    string Imie = reader.GetString(2);
+                    string Nazwisko = reader.GetString(3);
+                    string Nr_tel = reader.GetString(4);
+                    string Email = reader.GetString(5);
+                    string Rola = reader.GetString(6);
+                    User user = new User(Login, Imie, Nazwisko, Nr_tel, Email, Rola, Id_uzytkownika);
+                    return user;
+                }
+            }
+        }
+        return null;
+    }
+
     /// <summary>
     /// Usuwa uzytkownika
     /// </summary>

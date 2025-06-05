@@ -35,7 +35,7 @@ if (!first_run)
             + "\"Haslo\"	TEXT NOT NULL,"
             + "\"Imie\"	TEXT NOT NULL,"
             + "\"Nazwisko\"	TEXT NOT NULL,"
-            + "\"Nr_tel\"	TEXT,"
+            + "\"Nr_tel\"	TEXT NOT NULL,"
             + "\"Email\"	TEXT NOT NULL,"
             + "\"Rola\"	    TEXT NOT NULL);";
         createTableCmd.ExecuteNonQuery();

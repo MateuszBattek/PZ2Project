@@ -14,10 +14,10 @@ public class IO : Controller
     //Obsługa metody GET 
     public IActionResult Logowanie()
     {
-        if (!HttpContext.Session.Keys.Contains("user_id"))
+        if (!HttpContext.Session.Keys.Contains("Id_uzytkownika"))
             ViewData["login_status"] = "Nie zalogowano";
         else
-            ViewData["login_status"] = HttpContext.Session.GetString("login_status");
+            ViewData["login_status"] = "Zalogowano";
         return View();
         
     }
@@ -33,17 +33,15 @@ public class IO : Controller
         bool zalogowany = user != null;
         
         string login_status;
-        if(zalogowany)
+        if (zalogowany)
+        {
             login_status = "Zalogowano";
+            HttpContext.Session.SetInt32("Id_uzytkownika", user.Id_uzytkownika ?? 0);
+            HttpContext.Session.SetString("Rola", user.Rola ?? "");
+        }
         else
-            login_status = "Błędny login lub hasło";
-
-
-
-
-        HttpContext.Session.SetString("login_status", login_status);
-        if (login_status == "Zalogowano")
-            return RedirectToAction("SecretData");
+            login_status = "Nie zalogowano";
+            
         ViewData["login_status"] = login_status;
 
         return View();

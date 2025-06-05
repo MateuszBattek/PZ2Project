@@ -74,7 +74,7 @@ public class DBModel
         {
             connection.Open();
             var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = "SELECT Haslo, Imie, Nazwisko, Nr_tel, Email, Rola FROM Uzytkownicy WHERE Login = @login";
+            selectCmd.CommandText = "SELECT Haslo, Imie, Nazwisko, Nr_tel, Email, Rola, Id_uzytkownika FROM Uzytkownicy WHERE Login = @login";
             selectCmd.Parameters.AddWithValue("@login", login);
             using (var reader = selectCmd.ExecuteReader())
             {
@@ -86,7 +86,8 @@ public class DBModel
                     string nr_tel = reader.GetString(3);
                     string email = reader.GetString(4);
                     string rola = reader.GetString(5);
-                    user = new User(login, imie, nazwisko, nr_tel, email, rola);
+                    int id_uzytkownika = reader.GetInt32(6);
+                    user = new User(login, imie, nazwisko, nr_tel, email, rola, id_uzytkownika);
                 }
                 else
                     return null;
@@ -118,7 +119,7 @@ public class DBModel
         {
             connection.Open();
             var selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = "SELECT Login, Imie, Nazwisko, Nr_tel, Email, Rola FROM Uzytkownicy";
+            selectCmd.CommandText = "SELECT Login, Imie, Nazwisko, Nr_tel, Email, Rola, Id_uzytkownika FROM Uzytkownicy";
             using (var reader = selectCmd.ExecuteReader())
             {
                 while (reader.Read())
@@ -130,48 +131,122 @@ public class DBModel
                     string nr_tel = reader.GetString(3);
                     string email = reader.GetString(4);
                     string rola = reader.GetString(5);
-                    user = new User(login, imie, nazwisko, nr_tel, email, rola);
+                    int id_uzytkownika = reader.GetInt32(6);
+                    user = new User(login, imie, nazwisko, nr_tel, email, rola, id_uzytkownika);
                     users.Add(user);
                 }
             }
         }
         return users;
     }
-    
+
     /// <summary>
     /// Metoda zwraca dług użytkownika (tyle ile musi zapłacić)
     /// uznaje, ze trzeba zapłacić, jeśli zmieni się miesiąc
     /// (nawet zawarcie umowy 2020.05.31 do data bieżąca 2020.06.01)
     /// </summary>
     /// <param name="user"></param>
-    /// <returns></returns>
-    public int userDebt(User user)
+    /// <returns>
+    /// zwraca Dictionary<int, int> z id_umowy jako klucz i kwotą jako wartość, JEŚLI KWOTA JEST UJEMNA to użytkownik nadpłacił
+    /// </returns>
+    public Dictionary<int, int> GetUserDebt(User user)
     {
-        int debt = 0;
+        Dictionary<int, int> debt = new Dictionary<int, int>();
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
             var selectCmd = connection.CreateCommand();
             selectCmd.CommandText = @"
-            SELECT 
-                ((strftime('%Y', 'now') - strftime('%Y', RMD)) * 12 +
-                (strftime('%m', 'now') - strftime('%m', RMD))) * O.Kwota AS Suma
+            SELECT
+                U.Id_umowy,
+                ((strftime('%Y', 'now') - strftime('%Y', U.Data_zawarcia)) * 12 +
+                (strftime('%m', 'now') - strftime('%m', U.Data_zawarcia))) * O.Kwota AS Suma
             FROM Umowy U
             JOIN Oferty O on U.Id_oferty = O.Id_oferty
-            WHERE Login = @login;
-            GROUP BY U.Id_oferty
+            JOIN Uzytkownicy U2 on U.Id_uzytkownika = U2.Id_uzytkownika
+            WHERE U2.Id_uzytkownika = @user_id and U.Data_zakonczenia IS NULL
+            GROUP BY U.Id_umowy
             ";
-            selectCmd.Parameters.AddWithValue("@login", user.Login);
+            selectCmd.Parameters.AddWithValue("@user_id", user.Id_uzytkownika);
 
             using (var reader = selectCmd.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    debt += reader.GetInt32(0);
+                    debt.Add(reader.GetInt32(0), reader.GetInt32(1));           //kwerenda licząca ile musi zapłacić    
+                }
+            }
+
+            selectCmd.CommandText = @"
+            SELECT 
+                U.Id_umowy, sum(P.Kwota)
+            FROM Umowy U
+            JOIN Platnosci P on U.Id_umowy = P.Id_umowy
+            JOIN Uzytkownicy U2 on U.Id_uzytkownika = U2.Id_uzytkownika
+            WHERE U2.Id_uzytkownika = @user_id and U.Data_zakonczenia IS NULL;
+            GROUP BY U.Id_umowy
+            ";
+            selectCmd.Parameters.AddWithValue("@user_id", user.Id_uzytkownika);
+
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    debt[reader.GetInt32(0)] -= reader.GetInt32(1);            //kwerenda licząca ile zapłacił
                 }
             }
         }
         return debt;
+    }
+
+    public List<Deal> GetUserActiveDeals(User user)
+    {
+        List<Deal> deals = new List<Deal>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = @"
+            SELECT Id_umowy, Id_uzytkownika, Id_oferty, Id_adresu, Data_zawarcia
+            FROM Umowy
+            WHERE Id_uzytkownika = @user_id and Data_zakonczenia IS NULL
+            ";
+            selectCmd.Parameters.AddWithValue("@user_id", user.Id_uzytkownika);
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    int id_umowy = reader.GetInt32(0);
+                    int id_uzytkownika = reader.GetInt32(1);
+                    int id_oferty = reader.GetInt32(2);
+                    int id_adresu = reader.GetInt32(3);
+                    DateTime data_zawarcia = DateTime.Parse(reader.GetString(4));
+                    Deal deal = new Deal(id_umowy, id_uzytkownika, id_oferty, id_adresu, data_zawarcia);
+                    deals.Add(deal);
+                }
+            }
+        }
+        return deals;
+    }
+
+
+    public void AddPayment(Payment payment)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var insertCmd = connection.CreateCommand();
+            insertCmd.CommandText = @"
+            INSERT INTO Platnosci (Id_platnosci, Id_uzytkownika, Id_umowy, Kwota, Data)
+            VALUES (@id_platnosci, @id_uzytkownika, @id_umowy, @kwota, @data)
+            ";
+            insertCmd.Parameters.AddWithValue("@id_platnosci", payment.Id_platnosci);
+            insertCmd.Parameters.AddWithValue("@id_uzytkownika", payment.Id_uzytkownika);
+            insertCmd.Parameters.AddWithValue("@id_umowy", payment.Id_umowy);
+            insertCmd.Parameters.AddWithValue("@kwota", payment.Kwota);
+            insertCmd.Parameters.AddWithValue("@data", payment.Data);
+            insertCmd.ExecuteNonQuery();
+        }
     }
 
 

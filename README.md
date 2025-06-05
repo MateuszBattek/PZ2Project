@@ -4,9 +4,9 @@ Baza danych:
 
 Uzytkownicy - Id_uzytkownika, Login, Haslo, Imie, Nazwisko, Nr_tel, Email, Rola
 Adresy - Id_adresu, Kraj, Wojewodztwo, Kod_pocztowy, Miasto, Ulica, Numer_domu, Numer_mieszkania
-Platnosci - Id_platnosci, Id_uzytkownika, Id_oferty, Kwota, Data
+Platnosci - Id_platnosci, Id_uzytkownika, Id_umowy, Kwota, Data
 Oferty - Id_oferty, Nazwa, Opis, Cena
-Umowy - Id_umowy, Id_uzytkownika, Id_oferty, Id_adresu, Data_zawarcia
+Umowy - Id_umowy, Id_uzytkownika, Id_oferty, Id_adresu, Data_zawarcia, Data_zakonczenia (null jeśli jeszcze trwa)
 
 platnosci za internet, podczas platnosci analiza tabeli platnosci
 (rabat jako osobne oferty)
@@ -38,12 +38,12 @@ controller/widok wpłata pieniędzy
 
 w modelu:
 dodawanie, usuwanie uzytkownika - gotowe
-zrobić funkcje zwracającą ile musi zapłacić użytkownik
+zrobić funkcje zwracającą ile musi zapłacić użytkownik - w trakcie
 zrobić funkcje zwracającą użytkowników, krórzy nie zapłacili
 zrobić funkcję wpłaty       // podajemy jako argument kto i ilość
 logowanie - gotowe
 dodanie oferty
-zrobić klasy dla każdej tabeli z bazy
+zrobić klasy dla każdej tabeli z bazy - gotowe
 
 
 

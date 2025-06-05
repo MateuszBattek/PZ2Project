@@ -1,6 +1,6 @@
 namespace MvcPracownicy.Models;
 
-//Oferty - Id_oferty, Nazwa, Opis, Cena
+// Oferty - Id_oferty, Nazwa, Opis, Cena
 
 public class Offer
 {

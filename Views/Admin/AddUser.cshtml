@@ -1,24 +1,24 @@
 <form asp-action="AddUser" method="post">
     <label for="login">Login: </label>
-    <input name="login" id="login" class="form-control" />
+    <input name="login" id="login" class="form-control" required />
     <br>
     <label for="haslo">Hasło: </label>
-    <input type="password" name="haslo" id="haslo" class="form-control" />
+    <input type="password" name="haslo" id="haslo" class="form-control" required />
     <br>
     <label for="imie">imie: </label>
-    <input name="imie" id="imie" class="form-control" />
+    <input name="imie" id="imie" class="form-control" required />
     <br>
     <label for="nazwisko">Nazwisko: </label>
-    <input name="nazwisko" id="nazwisko" class="form-control" />
+    <input name="nazwisko" id="nazwisko" class="form-control" required />
     <br>
     <label for="nr_tel">Numer telefonu: </label>
-    <input name="nr_tel" id="nr_tel" class="form-control" />
+    <input name="nr_tel" id="nr_tel" class="form-control" required />
     <br>
     <label for="email">Email: </label>
-    <input name="email" id="email" class="form-control" />
+    <input name="email" id="email" class="form-control" required />
     <br>
     <label for="rola">Rola: </label>
-    <input name="rola" id="rola" class="form-control" />
+    <input name="rola" id="rola" class="form-control" required />
     <br>
     <input type="submit" value="Zatwierdź" class="btn btn-primary" />
 </form>

@@ -275,6 +275,24 @@ public class DBModel
         return deals;
     }
 
+    public static void ChangeUserData(int user_id, User user)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var updateCmd = connection.CreateCommand();
+            updateCmd.CommandText = @"
+            UPDATE Uzytkownicy
+            SET Nr_tel = @nr_tel, Email = @email
+            WHERE Id_uzytkownika = @user_id
+            ";
+            updateCmd.Parameters.AddWithValue("@nr_tel", user.Nr_tel);
+            updateCmd.Parameters.AddWithValue("@email", user.Email);
+            updateCmd.Parameters.AddWithValue("@user_id", user_id);
+            updateCmd.ExecuteNonQuery();
+        }
+    }
+
 
     public static void AddPayment(Payment payment)
     {

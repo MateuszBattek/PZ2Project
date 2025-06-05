@@ -4,15 +4,15 @@ namespace MvcPracownicy.Models;
 
 public class Offer
 {
-    public int Id_oferty { get; set; }
+    public int? Id_oferty { get; set; }
     public string Nazwa { get; set; }
     public string Opis { get; set; }
-    public int Cena { get; set; }
-    public Offer(int id_oferty, string nazwa, string opis, int cena)
+    public int Cena { get; set; }                   // Cena jest w groszach 4000 = 40.00 PLN
+    public Offer(string nazwa, string opis, int cena, int? id_oferty = null)
     {
-        Id_oferty = id_oferty;
         Nazwa = nazwa;
         Opis = opis;
         Cena = cena;
+        Id_oferty = id_oferty;
     }
 }

@@ -221,7 +221,7 @@ public class DBModel
                     int id_oferty = reader.GetInt32(2);
                     int id_adresu = reader.GetInt32(3);
                     DateTime data_zawarcia = DateTime.Parse(reader.GetString(4));
-                    Deal deal = new Deal(id_umowy, id_uzytkownika, id_oferty, id_adresu, data_zawarcia);
+                    Deal deal = new Deal(id_uzytkownika, id_oferty, id_adresu, data_zawarcia, id_umowy);
                     deals.Add(deal);
                 }
             }
@@ -248,6 +248,105 @@ public class DBModel
             insertCmd.ExecuteNonQuery();
         }
     }
+
+    public void AddOffer(Offer offer)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var insertCmd = connection.CreateCommand();
+            insertCmd.CommandText = @"
+            INSERT INTO Oferty (Nazwa, Opis, Cena)
+            VALUES (@nazwa, @opis, @cena)
+            ";
+            insertCmd.Parameters.AddWithValue("@nazwa", offer.Nazwa);
+            insertCmd.Parameters.AddWithValue("@opis", offer.Opis);
+            insertCmd.Parameters.AddWithValue("@cena", offer.Cena);
+            insertCmd.ExecuteNonQuery();
+        }
+    }
+
+    public void DeleteOffer(int id_oferty)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var deleteCmd = connection.CreateCommand();
+            deleteCmd.CommandText = @"
+            DELETE FROM Oferty
+            WHERE Id_oferty = @id_oferty
+            ";
+            deleteCmd.Parameters.AddWithValue("@id_oferty", id_oferty);
+            deleteCmd.ExecuteNonQuery();
+        }
+    }
+
+    public List<Offer> GetOffers()
+    {
+        List<Offer> offers = new List<Offer>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = @"
+            SELECT Id_oferty, Nazwa, Opis, Cena
+            FROM Oferty
+            ";
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    int id_oferty = reader.GetInt32(0);
+                    string nazwa = reader.GetString(1);
+                    string opis = reader.GetString(2);
+                    int cena = reader.GetInt32(3);
+                    Offer offer = new Offer(nazwa, opis, cena, id_oferty);
+                    offers.Add(offer);
+                }
+            }
+        }
+        return offers;
+    }
+
+    public void AddDeal(Deal deal)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var insertCmd = connection.CreateCommand();
+            insertCmd.CommandText = @"
+            INSERT INTO Umowy (Id_uzytkownika, Id_oferty, Id_adresu, Data_zawarcia, Data_zakonczenia)
+            VALUES (@id_uzytkownika, @id_oferty, @id_adresu, @data_zawarcia, @data_zakonczenia)
+            ";
+            insertCmd.Parameters.AddWithValue("@id_uzytkownika", deal.Id_uzytkownika);
+            insertCmd.Parameters.AddWithValue("@id_oferty", deal.Id_oferty);
+            insertCmd.Parameters.AddWithValue("@id_adresu", deal.Id_adresu);
+            insertCmd.Parameters.AddWithValue("@data_zawarcia", deal.Data_zawarcia);
+            insertCmd.Parameters.AddWithValue("@data_zakonczenia", deal.Data_zakonczenia);
+            insertCmd.ExecuteNonQuery();
+        }
+    }
+    public void AddAddress(Address address)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var insertCmd = connection.CreateCommand();
+            insertCmd.CommandText = @"
+            INSERT INTO Adresy (Kraj, Wojewodztwo, Kod_pocztowy, Miasto, Ulica, Numer_domu, Numer_mieszkania)
+            VALUES (@kraj, @wojewodztwo, @kod_pocztowy, @miasto, @ulica, @numer_domu, @numer_mieszkania)
+            ";
+            insertCmd.Parameters.AddWithValue("@kraj", address.Kraj);
+            insertCmd.Parameters.AddWithValue("@wojewodztwo", address.Wojewodztwo);
+            insertCmd.Parameters.AddWithValue("@kod_pocztowy", address.Kod_pocztowy);
+            insertCmd.Parameters.AddWithValue("@miasto", address.Miasto);
+            insertCmd.Parameters.AddWithValue("@ulica", address.Ulica);
+            insertCmd.Parameters.AddWithValue("@numer_domu", address.Numer_domu);
+            insertCmd.Parameters.AddWithValue("@numer_mieszkania", address.Numer_mieszkania);
+            insertCmd.ExecuteNonQuery();
+        }
+    }
+    
 
 
 }

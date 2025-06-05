@@ -55,9 +55,9 @@ if (!first_run)
         createTableCmd.CommandText =
             "CREATE TABLE \"Platnosci\" ("
             + "\"Id_platnosci\"	INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + "\"Id_uzytkownika\"	INTEGER FOREIGN KEY,"
-            + "\"Id_oferty\"	INTEGER FOREIGN KEY,"
-            + "\"Kwota\"	INTEGER FOREIGN KEY,"
+            + "\"Id_uzytkownika\"	INTEGER,"
+            + "\"Id_oferty\"	INTEGER,"
+            + "\"Kwota\"	INTEGER,"
             + "\"Data\" TEXT NOT NULL);";
         createTableCmd.ExecuteNonQuery();
 
@@ -72,25 +72,25 @@ if (!first_run)
         createTableCmd.CommandText =
             "CREATE TABLE \"Umowy\" ("
             + "\"Id_umowy\"	INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + "\"Id_uzytkownika\"	INTEGER FOREIGN KEY,"
-            + "\"Id_oferty\"	INTEGER FOREIGN KEY,"
-            + "\"Id_adresu\"	INTEGER FOREIGN KEY,"
+            + "\"Id_uzytkownika\"	INTEGER,"
+            + "\"Id_oferty\"	INTEGER,"
+            + "\"Id_adresu\"	INTEGER,"
             + "\"Data_zawarcia\"	TEXT NOT NULL);";
         createTableCmd.ExecuteNonQuery();
 
         string admin_hash = "";
-        using (MD5 md5 = MD5.Create())
-        {
-            byte[] inputBytes = Encoding.UTF8.GetBytes("admin");
-            byte[] hashBytes = md5.ComputeHash(inputBytes);
-            admin_hash = Convert.ToHexString(hashBytes);
-        }
+        using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] inputBytes = Encoding.UTF8.GetBytes("admin");
+                byte[] hashBytes = sha256.ComputeHash(inputBytes);
+                admin_hash = Convert.ToHexString(hashBytes);
+            }
 
         SqliteCommand insertCmd = connection.CreateCommand();
         insertCmd.CommandText =
         "INSERT INTO Uzytkownicy"
-        + "(Login, Haslo, Imie, Nazwisko, Email, Rola)"
-        + "VALUES (\"admin\", +\"" + admin_hash + "\", \"Jan\", \"Kowalski\", \"admin@change.this\", \"Admin\");";
+        + "(Login, Haslo, Imie, Nazwisko, Nr_tel, Email, Rola)"
+        + "VALUES (\"admin\", +\"" + admin_hash + "\", \"Jan\", \"Kowalski\", \"123456789\", \"admin@change.this\", \"Admin\");";
         insertCmd.ExecuteNonQuery();
     }
 }

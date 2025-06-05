@@ -1,0 +1,31 @@
+@model List<MvcPracownicy.Models.Address>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Kraj</th>
+            <th>Województwo</th>
+            <th>Kod pocztowy</th>
+            <th>Miasto</th>
+            <th>Ulica</th>
+            <th>Nr domu</th>
+            <th>Nr mieszkania</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var address in Model)
+        {
+            <tr>
+                <td>@address.Id_adresu</td>
+                <td>@address.Kraj</td>
+                <td>@address.Wojewodztwo</td>
+                <td>@address.Kod_pocztowy</td>
+                <td>@address.Miasto</td>
+                <td>@address.Ulica</td>
+                <td>@address.Numer_domu</td>
+                <td>@(string.IsNullOrEmpty(address.Numer_mieszkania) ? "-" : address.Numer_mieszkania)</td>
+            </tr>
+        }
+    </tbody>
+</table>

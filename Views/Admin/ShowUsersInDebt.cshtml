@@ -1,0 +1,31 @@
+@model List<MvcPracownicy.Models.User>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Login</th>
+            <th>Imię</th>
+            <th>Nazwisko</th>
+            <th>Nr tel</th>
+            <th>Email</th>
+            <th>Rola</th>
+            <th>Dług</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Id_uzytkownika</td>
+                <td>@user.Login</td>
+                <td>@user.Imie</td>
+                <td>@user.Nazwisko</td>
+                <td>@user.Nr_tel</td>
+                <td>@user.Email</td>
+                <td>@user.Rola</td>
+                <td>@user.Debt</td>
+            </tr>
+        }
+    </tbody>
+</table>

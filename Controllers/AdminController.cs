@@ -86,7 +86,7 @@ public class AdminController : Controller
     public IActionResult AddDeal(IFormCollection form)
     {
         int id_uzytkownika;
-        if (!int.TryParse(form["id_pracownika"], out id_uzytkownika))
+        if (!int.TryParse(form["id_uzytkownika"], out id_uzytkownika))
             return View();
         int id_oferty;
         if (!int.TryParse(form["id_oferty"], out id_oferty))
@@ -106,9 +106,59 @@ public class AdminController : Controller
         if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
             return RedirectToAction("LogIn", "Authentication");
         return View(DBModel.GetUsers());
-        
+
     }
 
+    public IActionResult ShowUsersInDebt()
+    {
+        if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
+            return RedirectToAction("LogIn", "Authentication");
+        return View(DBModel.GetUsersWithDebt());
+    }
 
+    public IActionResult ShowOffers()
+    {
+        if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
+            return RedirectToAction("LogIn", "Authentication");
+        return View(DBModel.GetOffers());
+    }
+
+    public IActionResult ShowAddresses()
+    {
+        if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
+            return RedirectToAction("LogIn", "Authentication");
+        return View(DBModel.GetAddresses());
+    }
+
+    public IActionResult ShowDeals()
+    {
+        if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
+            return RedirectToAction("LogIn", "Authentication");
+        return View(DBModel.GetDeals());
+    }
+
+    public IActionResult ShowPayments()
+    {
+        if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
+            return RedirectToAction("LogIn", "Authentication");
+        return View(DBModel.GetPayments());
+    }
+
+    public IActionResult EndDeal()
+    {
+        if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
+            return RedirectToAction("LogIn", "Authentication");
+
+        return View();
+    }
+    [HttpPost]
+    public IActionResult EndDeal(IFormCollection form)
+    {
+        int id;
+        if (!int.TryParse(form["id_umowy"], out id))
+            return View();
+        DBModel.EndDeal(id);
+        return View();
+    }
 
 }

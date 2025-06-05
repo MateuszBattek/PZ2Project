@@ -1,6 +1,7 @@
 namespace MvcPracownicy.Models;
 
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -206,7 +207,7 @@ public class DBModel
             SELECT
                 U.Id_umowy,
                 ((strftime('%Y', 'now') - strftime('%Y', U.Data_zawarcia)) * 12 +
-                (strftime('%m', 'now') - strftime('%m', U.Data_zawarcia))) * O.Kwota AS Suma
+                (strftime('%m', 'now') - strftime('%m', U.Data_zawarcia))) * O.Cena AS Suma
             FROM Umowy U
             JOIN Oferty O on U.Id_oferty = O.Id_oferty
             JOIN Uzytkownicy U2 on U.Id_uzytkownika = U2.Id_uzytkownika
@@ -229,10 +230,9 @@ public class DBModel
             FROM Umowy U
             JOIN Platnosci P on U.Id_umowy = P.Id_umowy
             JOIN Uzytkownicy U2 on U.Id_uzytkownika = U2.Id_uzytkownika
-            WHERE U2.Id_uzytkownika = @user_id and U.Data_zakonczenia IS NULL;
+            WHERE U2.Id_uzytkownika = @user_id and U.Data_zakonczenia IS NULL
             GROUP BY U.Id_umowy
             ";
-            selectCmd.Parameters.AddWithValue("@user_id", user.Id_uzytkownika);
 
             using (var reader = selectCmd.ExecuteReader())
             {
@@ -243,6 +243,49 @@ public class DBModel
             }
         }
         return debt;
+    }
+
+
+
+    /// <summary>
+    /// Liczy długów uzytkowników
+    /// </summary>
+    /// <returns>
+    /// Metoda zwraca Dictionary<int, int> z id_uzytkownika jako klucz i kwotą jako wartość
+    /// </returns>
+    public static Dictionary<int, int> GetUsersDebt()
+    {
+        Dictionary<int, int> user_to_debt = new Dictionary<int, int>();
+        List<User> users = GetUsers();
+        foreach (User user in users)
+        {
+            Dictionary<int, int> deal_to_debt = GetUserDebt(user);
+            int user_debt = 0;
+            foreach (int value in deal_to_debt.Values)
+                user_debt += value;
+            if (user_debt > 0)
+                user_to_debt.Add(user.Id_uzytkownika!.Value, user_debt);
+        }
+        return user_to_debt;
+    }
+
+    public static List<User> GetUsersWithDebt()
+    {
+        List<User> users = GetUsers();
+        List<User> users_with_debt = new List<User>();
+        foreach (User user in users)
+        {
+            Dictionary<int, int> deal_to_debt = GetUserDebt(user);
+            int user_debt = 0;
+            foreach (int value in deal_to_debt.Values)
+                user_debt += value;
+            if (user_debt > 0)
+            {
+                user.Debt = user_debt;
+                users_with_debt.Add(user);
+            }
+        }
+        return users_with_debt;
     }
 
     public static List<Deal> GetUserActiveDeals(User user)
@@ -308,7 +351,8 @@ public class DBModel
             insertCmd.Parameters.AddWithValue("@id_uzytkownika", payment.Id_uzytkownika);
             insertCmd.Parameters.AddWithValue("@id_umowy", payment.Id_umowy);
             insertCmd.Parameters.AddWithValue("@kwota", payment.Kwota);
-            insertCmd.Parameters.AddWithValue("@data", payment.Data);
+            insertCmd.Parameters.AddWithValue("@data", DateTime.Now.ToString("yyyy-MM-dd"));
+
             insertCmd.ExecuteNonQuery();
         }
     }
@@ -372,6 +416,96 @@ public class DBModel
         return offers;
     }
 
+    public static List<Address> GetAddresses()
+    {
+        List<Address> addresses = new List<Address>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = @"
+            SELECT Id_adresu, Kraj, Wojewodztwo, Kod_pocztowy, Miasto, Ulica, Numer_domu, Numer_mieszkania
+            FROM Adresy
+            ";
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    int id_adresu = reader.GetInt32(0);
+                    string kraj = reader.GetString(1);
+                    string wojewodztwo = reader.GetString(2);
+                    string kod_pocztowy = reader.GetString(3);
+                    string miasto = reader.GetString(4);
+                    string ulica = reader.GetString(5);
+                    string numer_domu = reader.GetString(6);
+                    string numer_mieszkania = reader.IsDBNull(7) ? "-" : reader.GetString(7);
+                    Address address = new Address(kraj, wojewodztwo, kod_pocztowy, miasto, ulica, numer_domu, numer_mieszkania, id_adresu);
+                    addresses.Add(address);
+                }
+            }
+        }
+        return addresses;
+    }
+
+    public static List<Deal> GetDeals()
+    {
+        List<Deal> deals = new List<Deal>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = @"
+            SELECT Id_umowy, Id_uzytkownika, Id_oferty, Id_adresu, Data_zawarcia, Data_zakonczenia
+            FROM Umowy
+            ";
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    int id_umowy = reader.GetInt32(0);
+                    int id_uzytkownika = reader.GetInt32(1);
+                    int id_oferty = reader.GetInt32(2);
+                    int id_adresu = reader.GetInt32(3);
+                    DateTime data_zawarcia = DateTime.Parse(reader.GetString(4));
+                    DateTime? data_zakonczenia = reader.IsDBNull(5) ? null : reader.GetDateTime(5);
+                    Deal deal = new Deal(id_uzytkownika, id_oferty, id_adresu, data_zawarcia, id_umowy, data_zakonczenia);
+                    deals.Add(deal);
+                }
+            }
+        }
+        return deals;
+    }
+
+    public static List<Payment> GetPayments()
+    {
+        List<Payment> payments = new List<Payment>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = @"
+            SELECT Id_platnosci, Id_uzytkownika, Id_umowy, Kwota, Data
+            FROM Platnosci
+            ";
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    int id_platnosci = reader.GetInt32(0);
+                    int id_uzytkownika = reader.GetInt32(1);
+                    int id_umowy = reader.GetInt32(2);
+                    int kwota = reader.GetInt32(3);
+                    DateTime data = DateTime.Parse(reader.GetString(4));
+                    Payment payment = new Payment(id_uzytkownika, id_umowy, kwota, data, id_platnosci);
+                    payments.Add(payment);
+                }
+            }
+        }
+        return payments;
+    }
+
+
+
     public static void AddDeal(Deal deal)
     {
         using (var connection = new SqliteConnection(connectionString))
@@ -379,14 +513,13 @@ public class DBModel
             connection.Open();
             var insertCmd = connection.CreateCommand();
             insertCmd.CommandText = @"
-            INSERT INTO Umowy (Id_uzytkownika, Id_oferty, Id_adresu, Data_zawarcia, Data_zakonczenia)
-            VALUES (@id_uzytkownika, @id_oferty, @id_adresu, @data_zawarcia, @data_zakonczenia)
+            INSERT INTO Umowy (Id_uzytkownika, Id_oferty, Id_adresu, Data_zawarcia)
+            VALUES (@id_uzytkownika, @id_oferty, @id_adresu, @data_zawarcia)
             ";
             insertCmd.Parameters.AddWithValue("@id_uzytkownika", deal.Id_uzytkownika);
             insertCmd.Parameters.AddWithValue("@id_oferty", deal.Id_oferty);
             insertCmd.Parameters.AddWithValue("@id_adresu", deal.Id_adresu);
-            insertCmd.Parameters.AddWithValue("@data_zawarcia", deal.Data_zawarcia);
-            insertCmd.Parameters.AddWithValue("@data_zakonczenia", deal.Data_zakonczenia);
+            insertCmd.Parameters.AddWithValue("@data_zawarcia", deal.Data_zawarcia.ToString("yyyy-MM-dd"));
             insertCmd.ExecuteNonQuery();
         }
     }
@@ -408,6 +541,23 @@ public class DBModel
             insertCmd.Parameters.AddWithValue("@numer_domu", address.Numer_domu);
             insertCmd.Parameters.AddWithValue("@numer_mieszkania", address.Numer_mieszkania);
             insertCmd.ExecuteNonQuery();
+        }
+    }
+
+    public static void EndDeal(int deal_id)
+    {
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var updateCmd = connection.CreateCommand();
+            updateCmd.CommandText = @"
+            UPDATE Umowy
+            SET Data_zakonczenia = @data_zakonczenia
+            WHERE Id_umowy = @id_umowy
+            ";
+            updateCmd.Parameters.AddWithValue("@data_zakonczenia", DateTime.Now.ToString("yyyy-MM-dd"));
+            updateCmd.Parameters.AddWithValue("@id_umowy", deal_id);
+            updateCmd.ExecuteNonQuery();
         }
     }
 

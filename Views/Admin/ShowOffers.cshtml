@@ -1,0 +1,23 @@
+@model List<MvcPracownicy.Models.Offer>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nazwa</th>
+            <th>Opis</th>
+            <th>Cena (w groszach)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var offer in Model)
+    {
+        <tr>
+            <td>@offer.Id_oferty</td>
+            <td>@offer.Nazwa</td>
+            <td>@offer.Opis</td>
+            <td>@offer.Cena</td>
+        </tr>
+    }
+    </tbody>
+</table>

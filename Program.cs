@@ -56,7 +56,7 @@ if (!first_run)
             "CREATE TABLE \"Platnosci\" ("
             + "\"Id_platnosci\"	INTEGER PRIMARY KEY AUTOINCREMENT,"
             + "\"Id_uzytkownika\"	INTEGER,"
-            + "\"Id_oferty\"	INTEGER,"
+            + "\"Id_umowy\"	INTEGER,"
             + "\"Kwota\"	INTEGER,"
             + "\"Data\" TEXT NOT NULL);";
         createTableCmd.ExecuteNonQuery();
@@ -75,7 +75,8 @@ if (!first_run)
             + "\"Id_uzytkownika\"	INTEGER,"
             + "\"Id_oferty\"	INTEGER,"
             + "\"Id_adresu\"	INTEGER,"
-            + "\"Data_zawarcia\"	TEXT NOT NULL);";
+            + "\"Data_zawarcia\"	TEXT NOT NULL,"
+            + "\"Data_zakonczenia\"	TEXT);";
         createTableCmd.ExecuteNonQuery();
 
         string admin_hash = "";

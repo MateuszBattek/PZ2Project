@@ -1,0 +1,25 @@
+@model List<MvcPracownicy.Models.Payment>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id płatności</th>
+            <th>Id użytkownika</th>
+            <th>Id umowy</th>
+            <th>Kwota (w groszach)</th>
+            <th>Data</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var payment in Model)
+        {
+            <tr>
+                <td>@(payment.Id_platnosci ?? -1)</td>
+                <td>@payment.Id_uzytkownika</td>
+                <td>@payment.Id_umowy</td>
+                <td>@payment.Kwota</td>
+                <td>@payment.Data.ToString("yyyy-MM-dd")</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -11,6 +11,7 @@ public class User
     public string Nr_tel { get; set; }
     public string Email { get; set; }
     public string Rola { get; set; }
+    public int Debt { get; set; } = 0;
 
     public User(string login, string imie, string nazwisko, string nr_tel, string email, string rola, int? id_uzytkownika = null)
     {

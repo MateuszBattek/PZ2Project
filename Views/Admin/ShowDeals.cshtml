@@ -1,0 +1,27 @@
+@model List<MvcPracownicy.Models.Deal>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id umowy</th>
+            <th>Id użytkownika</th>
+            <th>Id oferty</th>
+            <th>Id adresu</th>
+            <th>Data zawarcia</th>
+            <th>Data zakończenia</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var deal in Model)
+    {
+        <tr>
+            <td>@deal.Id_umowy</td>
+            <td>@deal.Id_uzytkownika</td>
+            <td>@deal.Id_oferty</td>
+            <td>@deal.Id_adresu</td>
+            <td>@deal.Data_zawarcia.ToString("yyyy-MM-dd")</td>
+            <td>@(deal.Data_zakonczenia?.ToString("yyyy-MM-dd") ?? "-")</td>
+        </tr>
+    }
+    </tbody>
+</table>

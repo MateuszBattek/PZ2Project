@@ -9,7 +9,7 @@
     <input type="number" name="id_adresu" id="id_adresu" class="form-control" required/>
     <br>
     <label for="data_zawarcia">Data zawarcia umowy(RRRR-MM-DD): </label>
-    <input type="date" name="data_zawarcia" id="data_zawarcia" class="form-control" required/>
+    <input name="data_zawarcia" id="data_zawarcia" class="form-control" pattern="\d{4}-\d{2}-\d{2}" title="Format: RRRR-MM-DD" required/>
     <br>
     <input type="submit" value="Zatwierdź" class="btn btn-primary" />
 </form>

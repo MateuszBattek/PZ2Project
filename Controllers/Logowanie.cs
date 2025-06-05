@@ -6,18 +6,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using System.Security.Cryptography;
 using Microsoft.Data.Sqlite;
+using MvcPracownicy.Models;
 using System.Text;
 public class IO : Controller
 {
-    
+
     //Obsługa metody GET 
     public IActionResult Logowanie()
     {
-        if(!HttpContext.Session.Keys.Contains("login_status"))
+        if (!HttpContext.Session.Keys.Contains("user_id"))
             ViewData["login_status"] = "Nie zalogowano";
         else
             ViewData["login_status"] = HttpContext.Session.GetString("login_status");
         return View();
+        
     }
 
     //Obsługa metody POST
@@ -26,32 +28,18 @@ public class IO : Controller
     {
         string login = form["login"].ToString();
         string haslo = form["haslo"].ToString();
+
+        User? user = LogIn(login, haslo);
         bool zalogowany = false;
-        var connectionStringBuilder = new SqliteConnectionStringBuilder();
-        connectionStringBuilder.DataSource = "./baza.db";
-        using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString)){
-
-            string haslo_hash = "";
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] inputBytes = Encoding.UTF8.GetBytes(haslo);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-                haslo_hash = Convert.ToHexString(hashBytes);
-            }
-
-            connection.Open();
-            SqliteCommand selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = $"SELECT COUNT(*) FROM Loginy WHERE Login = \"{login}\" AND Haslo = \"{haslo_hash}\"";
-            string result = selectCmd.ExecuteScalar().ToString();
-            if(result == "1")
-                zalogowany = true;
-        }
-
         string login_status;
         if(zalogowany)
             login_status = "Zalogowano";
         else
             login_status = "Błędny login lub hasło";
+
+
+
+
         HttpContext.Session.SetString("login_status", login_status);
         if (login_status == "Zalogowano")
             return RedirectToAction("SecretData");
@@ -60,12 +48,6 @@ public class IO : Controller
         return View();
     }
 
-    public IActionResult SecretData()
-    {
-        if (HttpContext.Session.Keys.Contains("login_status") && HttpContext.Session.GetString("login_status") == "Zalogowano")
-            return View();
-        return RedirectToAction("Logowanie");
-    }
 
     public IActionResult Logout()
     {

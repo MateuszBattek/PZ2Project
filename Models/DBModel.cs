@@ -10,7 +10,7 @@ using System.Text;
 public class DBModel
 {
     private readonly string connectionString = "Models/database.db";
-    public void AddUser(User user, string password)
+    public static void AddUser(User user, string password)
     {
         var connectionStringBuilder = new SqliteConnectionStringBuilder();
         connectionStringBuilder.DataSource = connectionString;
@@ -44,7 +44,7 @@ public class DBModel
     /// Usuwa uzytkownika
     /// </summary>
     /// <param name="login"></param>
-    public void DeleteUser(string login)
+    public static void DeleteUser(string login)
     {
         var connectionStringBuilder = new SqliteConnectionStringBuilder();
         connectionStringBuilder.DataSource = connectionString;
@@ -66,7 +66,7 @@ public class DBModel
     /// <returns>
     /// User lub null jeśli go nie ma/jest złe hasło
     /// </returns>
-    public User? LogIn(string login, string haslo)
+    public static User? LogIn(string login, string haslo)
     {
         string hashZBazy = "";
         User? user = null;
@@ -112,7 +112,7 @@ public class DBModel
     /// <returns>
     /// zwraca List<User> z wszystkimi użytkownikami
     /// </returns>
-    public List<User> GetUsers()
+    public static List<User> GetUsers()
     {
         List<User> users = new List<User>();
         using (var connection = new SqliteConnection(connectionString))
@@ -149,7 +149,7 @@ public class DBModel
     /// <returns>
     /// zwraca Dictionary<int, int> z id_umowy jako klucz i kwotą jako wartość, JEŚLI KWOTA JEST UJEMNA to użytkownik nadpłacił
     /// </returns>
-    public Dictionary<int, int> GetUserDebt(User user)
+    public static Dictionary<int, int> GetUserDebt(User user)
     {
         Dictionary<int, int> debt = new Dictionary<int, int>();
         using (var connection = new SqliteConnection(connectionString))
@@ -199,7 +199,7 @@ public class DBModel
         return debt;
     }
 
-    public List<Deal> GetUserActiveDeals(User user)
+    public static List<Deal> GetUserActiveDeals(User user)
     {
         List<Deal> deals = new List<Deal>();
         using (var connection = new SqliteConnection(connectionString))
@@ -230,7 +230,7 @@ public class DBModel
     }
 
 
-    public void AddPayment(Payment payment)
+    public static void AddPayment(Payment payment)
     {
         using (var connection = new SqliteConnection(connectionString))
         {
@@ -249,7 +249,7 @@ public class DBModel
         }
     }
 
-    public void AddOffer(Offer offer)
+    public static void AddOffer(Offer offer)
     {
         using (var connection = new SqliteConnection(connectionString))
         {
@@ -266,7 +266,7 @@ public class DBModel
         }
     }
 
-    public void DeleteOffer(int id_oferty)
+    public static void DeleteOffer(int id_oferty)
     {
         using (var connection = new SqliteConnection(connectionString))
         {
@@ -281,7 +281,7 @@ public class DBModel
         }
     }
 
-    public List<Offer> GetOffers()
+    public static List<Offer> GetOffers()
     {
         List<Offer> offers = new List<Offer>();
         using (var connection = new SqliteConnection(connectionString))
@@ -308,7 +308,7 @@ public class DBModel
         return offers;
     }
 
-    public void AddDeal(Deal deal)
+    public static void AddDeal(Deal deal)
     {
         using (var connection = new SqliteConnection(connectionString))
         {
@@ -326,7 +326,7 @@ public class DBModel
             insertCmd.ExecuteNonQuery();
         }
     }
-    public void AddAddress(Address address)
+    public static void AddAddress(Address address)
     {
         using (var connection = new SqliteConnection(connectionString))
         {

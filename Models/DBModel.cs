@@ -23,17 +23,18 @@ public class DBModel
             }
             connection.Open();
             SqliteCommand insertCmd = connection.CreateCommand();
-            insertCmd.CommandText = @"
-                INSERT INTO Uzytkownicy (Login, Haslo, Imie, Nazwisko, Nr_tel, Email, Rola)
-                VALUES (@login, @haslo, @imie, @nazwisko, @nrTel, @email, @rola)";
-            insertCmd.Parameters.AddWithValue("@login", user.Login);
-            insertCmd.Parameters.AddWithValue("@haslo", password);
-            insertCmd.Parameters.AddWithValue("@imie", user.Imie);
-            insertCmd.Parameters.AddWithValue("@nazwisko", user.Nazwisko);
-            insertCmd.Parameters.AddWithValue("@nrTel", user.Nr_tel);
-            insertCmd.Parameters.AddWithValue("@email", user.Email);
-            insertCmd.Parameters.AddWithValue("@rola", user.Rola);
+            insertCmd.CommandText =
+    "INSERT INTO Uzytkownicy (Login, Haslo, Imie, Nazwisko, Nr_tel, Email, Rola) " +
+    "VALUES (@Login, @Haslo, @Imie, @Nazwisko, @Nr_tel, @Email, @Rola);";
 
+            insertCmd.Parameters.AddWithValue("@Login", user.Login);
+            insertCmd.Parameters.AddWithValue("@Haslo", password_hash);
+            insertCmd.Parameters.AddWithValue("@Imie", user.Imie);
+            insertCmd.Parameters.AddWithValue("@Nazwisko", user.Nazwisko);
+            insertCmd.Parameters.AddWithValue("@Nr_tel", user.Nr_tel);
+            insertCmd.Parameters.AddWithValue("@Email", user.Email);
+            insertCmd.Parameters.AddWithValue("@Rola", user.Rola);
+            
             insertCmd.ExecuteNonQuery();
         }
     }
@@ -369,7 +370,7 @@ public class DBModel
             insertCmd.ExecuteNonQuery();
         }
     }
-    
+
 
 
 }

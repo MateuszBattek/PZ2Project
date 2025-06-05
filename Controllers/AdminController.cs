@@ -7,7 +7,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Data.Sqlite;
 using System.Text;
 
-public class AdminController : Controller{
+public class AdminController : Controller
+{
 
     public IActionResult ShowPanel()
     {
@@ -34,10 +35,10 @@ public class AdminController : Controller{
         string nr_tel = form["nr_tel"].ToString();
         string email = form["email"].ToString();
         string rola = form["rola"].ToString();
-        
+
 
         DBModel.AddUser(new User(login, imie, nazwisko, nr_tel, email, rola), haslo);
-        
+
         return View();
 
     }

@@ -43,6 +43,23 @@ public class UserController : Controller
 
     }
 
+    public IActionResult MyPayments()
+    {
+        return View();
+    }
+
+    public IActionResult ShowUserDeals()
+    {
+        // if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
+        //     return RedirectToAction("LogIn", "Authentication");
+        return View(DBModel.GetUserDeals(HttpContext.Session.GetInt32("Id_uzytkownika") ?? 0));
+    }
+
+    public IActionResult ShowUserDebts()
+    {
+        return View(DBModel.GetUserDebt(HttpContext.Session.GetInt32("Id_uzytkownika") ?? 0));
+    }
+
 
 
 }

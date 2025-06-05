@@ -196,7 +196,7 @@ public class DBModel
     /// <returns>
     /// zwraca Dictionary<int, int> z id_umowy jako klucz i kwotą jako wartość, JEŚLI KWOTA JEST UJEMNA to użytkownik nadpłacił
     /// </returns>
-    public static Dictionary<int, int> GetUserDebt(User user)
+    public static Dictionary<int, int> GetUserDebt(int Id_uzytkownika)
     {
         Dictionary<int, int> debt = new Dictionary<int, int>();
         using (var connection = new SqliteConnection(connectionString))
@@ -214,7 +214,7 @@ public class DBModel
             WHERE U2.Id_uzytkownika = @user_id and U.Data_zakonczenia IS NULL
             GROUP BY U.Id_umowy
             ";
-            selectCmd.Parameters.AddWithValue("@user_id", user.Id_uzytkownika);
+            selectCmd.Parameters.AddWithValue("@user_id", Id_uzytkownika);
 
             using (var reader = selectCmd.ExecuteReader())
             {
@@ -259,7 +259,7 @@ public class DBModel
         List<User> users = GetUsers();
         foreach (User user in users)
         {
-            Dictionary<int, int> deal_to_debt = GetUserDebt(user);
+            Dictionary<int, int> deal_to_debt = GetUserDebt(user.Id_uzytkownika ?? 0);
             int user_debt = 0;
             foreach (int value in deal_to_debt.Values)
                 user_debt += value;
@@ -275,7 +275,7 @@ public class DBModel
         List<User> users_with_debt = new List<User>();
         foreach (User user in users)
         {
-            Dictionary<int, int> deal_to_debt = GetUserDebt(user);
+            Dictionary<int, int> deal_to_debt = GetUserDebt(user.Id_uzytkownika ?? 0);
             int user_debt = 0;
             foreach (int value in deal_to_debt.Values)
                 user_debt += value;
@@ -315,6 +315,57 @@ public class DBModel
                 }
             }
         }
+        return deals;
+    }
+
+    public static List<Deal> GetUserDeals(int Id_uzytkownika)
+    {
+        List<Deal> deals = new List<Deal>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = @"
+            SELECT Id_umowy, Id_oferty, Id_adresu, Data_zawarcia, Data_zakonczenia
+            FROM Umowy
+            WHERE Id_uzytkownika = @user_id
+        ";
+            selectCmd.Parameters.AddWithValue("@user_id", Id_uzytkownika);
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    int id_umowy = reader.GetInt32(0);
+                    // int id_uzytkownika = reader.GetInt32(1); // To jest ID użytkownika, które już masz
+                    int id_oferty = reader.GetInt32(1); // Kolumna 1 to Id_oferty
+                    int id_adresu = reader.GetInt32(2); // Kolumna 2 to Id_adresu
+
+                    // Poprawne parsowanie dat
+                    DateTime data_zawarcia = reader.GetDateTime(3); // Jeśli to data, lepiej GetDateTime
+
+                    DateTime? data_zakonczenia = null; // Użyj DateTime? (Nullable DateTime)
+
+                    // Sprawdź, czy wartość w kolumnie Data_zakonczenia jest NULL w bazie
+                    if (!reader.IsDBNull(4)) // Sprawdź, czy kolumna o indeksie 4 (Data_zakonczenia) NIE jest NULL
+                    {
+                        data_zakonczenia = reader.GetDateTime(4); // Jeśli nie jest NULL, pobierz jako DateTime
+                    }
+
+                    // Utwórz obiekt Deal. Pamiętaj, że konstruktor Deal musi przyjmować DateTime?
+                    // Jeśli konstruktor Deal wymaga DateTime, zdecyduj, co ma być domyślną wartością dla NULL (np. DateTime.MinValue)
+                    Deal deal = new Deal(
+                        Id_uzytkownika,
+                        id_oferty,
+                        id_adresu,
+                        data_zawarcia,
+                        id_umowy,
+                        data_zakonczenia // Tutaj przekazujesz nullable DateTime?
+                    );
+                    deals.Add(deal);
+                }
+            }
+        }
+        Console.WriteLine(deals);
         return deals;
     }
 

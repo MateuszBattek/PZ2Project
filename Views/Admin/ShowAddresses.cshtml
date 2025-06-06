@@ -1,31 +1,50 @@
 @model List<MvcPracownicy.Models.Address>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Kraj</th>
-            <th>Województwo</th>
-            <th>Kod pocztowy</th>
-            <th>Miasto</th>
-            <th>Ulica</th>
-            <th>Nr domu</th>
-            <th>Nr mieszkania</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(var address in Model)
-        {
-            <tr>
-                <td>@address.Id_adresu</td>
-                <td>@address.Kraj</td>
-                <td>@address.Wojewodztwo</td>
-                <td>@address.Kod_pocztowy</td>
-                <td>@address.Miasto</td>
-                <td>@address.Ulica</td>
-                <td>@address.Numer_domu</td>
-                <td>@(string.IsNullOrEmpty(address.Numer_mieszkania) ? "-" : address.Numer_mieszkania)</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@{
+    ViewData["Title"] = "Lista Adresów";
+}
+
+
+<h1 class="display-5 text-dark mb-4">@ViewData["Title"]</h1>
+
+<div class="container my-4">
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped table-hover shadow-sm rounded">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Kraj</th>
+                    <th scope="col">Województwo</th>
+                    <th scope="col">Kod pocztowy</th>
+                    <th scope="col">Miasto</th>
+                    <th scope="col">Ulica</th>
+                    <th scope="col">Nr domu</th>
+                    <th scope="col">Nr mieszkania</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var address in Model)
+                {
+                    <tr>
+                        <td>@address.Id_adresu</td>
+                        <td>@address.Kraj</td>
+                        <td>@address.Wojewodztwo</td>
+                        <td>@address.Kod_pocztowy</td>
+                        <td>@address.Miasto</td>
+                        <td>@address.Ulica</td>
+                        <td>@address.Numer_domu</td>
+                        <td>@(string.IsNullOrEmpty(address.Numer_mieszkania) ? "-" : address.Numer_mieszkania)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info shadow-sm rounded-lg p-4" role="alert">
+            <p class="mb-0">Brak zarejestrowanych adresów do wyświetlenia.</p>
+        </div>
+    }
+</div>

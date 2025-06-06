@@ -1,31 +1,49 @@
 @model List<MvcPracownicy.Models.User>
 
-<h2>Lista użytkowników</h2>
+@{
+    ViewData["Title"] = "Lista Użytkowników";
+}
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Login</th>
-            <th>Imię</th>
-            <th>Nazwisko</th>
-            <th>Nr telefonu</th>
-            <th>Email</th>
-            <th>Rola</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
-        {
-            <tr>
-                <td>@user.Id_uzytkownika</td>
-                <td>@user.Login</td>
-                <td>@user.Imie</td>
-                <td>@user.Nazwisko</td>
-                <td>@user.Nr_tel</td>
-                <td>@user.Email</td>
-                <td>@user.Rola</td>
-            </tr>
-        }
-    </tbody>
-</table>
+
+<h1 class="display-5 text-dark mb-4">@ViewData["Title"]</h1>
+
+<div class="container my-4">
+
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped table-hover shadow-sm rounded">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Login</th>
+                    <th scope="col">Imię</th>
+                    <th scope="col">Nazwisko</th>
+                    <th scope="col">Nr telefonu</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Rola</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Id_uzytkownika</td>
+                        <td>@user.Login</td>
+                        <td>@user.Imie</td>
+                        <td>@user.Nazwisko</td>
+                        <td>@user.Nr_tel</td>
+                        <td>@user.Email</td>
+                        <td>@user.Rola</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info shadow-sm rounded-lg p-4" role="alert">
+            <p class="mb-0">Brak zarejestrowanych użytkowników do wyświetlenia.</p>
+        </div>
+    }
+</div>

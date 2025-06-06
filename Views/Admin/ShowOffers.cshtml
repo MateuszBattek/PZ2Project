@@ -1,23 +1,42 @@
 @model List<MvcPracownicy.Models.Offer>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nazwa</th>
-            <th>Opis</th>
-            <th>Cena</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var offer in Model)
-        {
-            <tr>
-                <td>@offer.Id_oferty</td>
-                <td>@offer.Nazwa</td>
-                <td>@offer.Opis</td>
-                <td>@offer.Cena</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@{
+    ViewData["Title"] = "Lista Ofert"; // Ustawienie tytułu strony
+}
+
+
+<h1 class="display-5 text-dark mb-4">@ViewData["Title"]</h1>
+
+<div class="container my-4">
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped table-hover shadow-sm rounded">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nazwa</th>
+                    <th scope="col">Opis</th>
+                    <th scope="col">Cena</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var offer in Model)
+                {
+                    <tr>
+                        <td>@offer.Id_oferty</td>
+                        <td>@offer.Nazwa</td>
+                        <td>@offer.Opis</td>
+                        <td>@offer.Cena</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info shadow-sm rounded-lg p-4" role="alert">
+            <p class="mb-0">Brak zarejestrowanych ofert do wyświetlenia.</p>
+        </div>
+    }
+</div>

@@ -1,25 +1,44 @@
 @model List<MvcPracownicy.Models.Payment>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id płatności</th>
-            <th>Id użytkownika</th>
-            <th>Id umowy</th>
-            <th>Kwota (w groszach)</th>
-            <th>Data</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var payment in Model)
-        {
-            <tr>
-                <td>@(payment.Id_platnosci ?? -1)</td>
-                <td>@payment.Id_uzytkownika</td>
-                <td>@payment.Id_umowy</td>
-                <td>@payment.Kwota</td>
-                <td>@payment.Data.ToString("yyyy-MM-dd")</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@{
+    ViewData["Title"] = "Lista Płatności";
+}
+
+<h1 class="display-5 text-dark mb-4">@ViewData["Title"]</h1>
+
+<div class="container my-4">
+
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped table-hover shadow-sm rounded">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th scope="col">Id płatności</th>
+                    <th scope="col">Id użytkownika</th>
+                    <th scope="col">Id umowy</th>
+                    <th scope="col">Kwota (w groszach)</th>
+                    <th scope="col">Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var payment in Model)
+                {
+                    <tr>
+                        <td>@(payment.Id_platnosci ?? -1)</td>
+                        <td>@payment.Id_uzytkownika</td>
+                        <td>@payment.Id_umowy</td>
+                        <td>@payment.Kwota</td>
+                        <td>@payment.Data.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info shadow-sm rounded-lg p-4" role="alert">
+            <p class="mb-0">Brak zarejestrowanych płatności do wyświetlenia.</p>
+        </div>
+    }
+</div>

@@ -1,7 +1,7 @@
 @model List<MvcPracownicy.Models.User>
 
 @{
-    ViewData["Title"] = "Lista Użytkowników";
+    ViewData["Title"] = "Ranking zadłużenia";
 }
 
 
@@ -26,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var user in Model)
+                @foreach (var user in Model.OrderByDescending(u => u.Debt))
                 {
                     <tr>
                         <td>@user.Id_uzytkownika</td>

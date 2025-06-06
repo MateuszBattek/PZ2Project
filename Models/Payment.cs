@@ -9,6 +9,11 @@ public class Payment
     public int Id_umowy { get; set; }
     public int Kwota { get; set; }              // Kwota jest w groszach 4000 = 40.00 PLN
     public DateTime Data { get; set; }
+
+    public Payment()
+    {
+
+    }
     public Payment(int id_uzytkownika, int id_umowy, int kwota, DateTime data, int? id_platnosci = null)
     {
         Id_uzytkownika = id_uzytkownika;

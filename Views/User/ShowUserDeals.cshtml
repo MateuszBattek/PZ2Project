@@ -1,25 +1,89 @@
-@model List<MvcPracownicy.Models.Deal>
+@model List<MvcPracownicy.Models.UserDealDetails>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id umowy</th>
-            <th>Id oferty</th>
-            <th>Id adresu</th>
-            <th>Data zawarcia</th>
-            <th>Data zakończenia</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var deal in Model)
-        {
-            <tr>
-                <td>@deal.Id_umowy</td>
-                <td>@deal.Id_oferty</td>
-                <td>@deal.Id_adresu</td>
-                <td>@deal.Data_zawarcia.ToString("yyyy-MM-dd")</td>
-                <td>@(deal.Data_zakonczenia?.ToString("yyyy-MM-dd") ?? "-")</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@{
+    ViewData["Title"] = "Moje Umowy";
+}
+
+<h1 class="display-5 text-dark mb-4">@ViewData["Title"]</h1>
+
+<div class="container my-4">
+    @* Wyświetlanie komunikatów sukcesu/błędu *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped table-hover shadow-sm rounded">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th scope="col">ID Umowy</th>
+                    <th scope="col">Nazwa Oferty</th>
+                    <th scope="col">ID Adresu</th>
+                    <th scope="col">Data Zawarcia</th>
+                    <th scope="col">Data Zakończenia</th>
+                    <th scope="col">Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var deal in Model)
+                {
+                    <tr>
+                        <td>@deal.Id_umowy</td>
+                        <td>@deal.NazwaOferty</td>
+                        <td>@deal.Id_adresu</td>
+                        <td>@deal.Data_zawarcia.ToShortDateString()</td>
+                        <td>
+                            @* Wyświetl datę zakończenia, jeśli istnieje, w przeciwnym razie wyświetl "Aktywna" *@
+                            @(deal.Data_zakonczenia?.ToShortDateString() ?? "Aktywna")
+                        </td>
+                        <td>
+                            @if (deal.Data_zakonczenia == null) @* Tylko jeśli umowa jest aktywna, pokaż przyciski *@
+                            {
+                                <div class="d-grid gap-2"> @* Użyj d-grid i gap-2 dla lepszego odstępu między przyciskami *@
+                                    <!-- Przycisk "Zakończ Umowę" -->
+                                    <form asp-controller="User" asp-action="EndDeal" method="post" class="d-inline">
+                                        <input type="hidden" name="dealId" value="@deal.Id_umowy" />
+                                        <button type="submit" class="btn btn-danger btn-sm w-100 mb-2">Zakończ Umowę</button>
+                                        @Html.AntiForgeryToken()
+                                    </form>
+
+                                    <!-- Formularz do płatności -->
+                                    <form asp-controller="User" asp-action="AddPayment" method="post"
+                                        class="d-flex align-items-center">
+                                        <input type="hidden" name="dealId" value="@deal.Id_umowy" />
+                                        <input type="number" step="0.01" min="0.01" name="amount"
+                                            class="form-control form-control-sm me-2" placeholder="Kwota" required />
+                                        <button type="submit" class="btn btn-success btn-sm flex-shrink-0">Zapłać</button>
+                                        @Html.AntiForgeryToken()
+                                    </form>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Zakończona</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info shadow-sm rounded-lg p-4" role="alert">
+            <p class="mb-0">Brak zarejestrowanych umów dla tego użytkownika.</p>
+        </div>
+    }
+</div>

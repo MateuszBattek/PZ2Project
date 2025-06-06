@@ -26,20 +26,20 @@
                                 asp-action="LogIn">Logowanie</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Authentication"
-                                asp-action="LogOut">Wyloguj</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Admin"
                                 asp-action="ShowPanel">Admin Panel</a>
+                        </li>
+                        <li class="nav-item"></li>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="MyPayments">User
+                            Panel</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="User"
                                 asp-action="ChangeUserData">Edytuj Profil</a>
                         </li>
                         <li class="nav-item"></li>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="MyPayments">Moje
-                            Płatności</a>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Authentication"
+                            asp-action="LogOut">Wyloguj</a>
                         </li>
                     </ul>
                 </div>

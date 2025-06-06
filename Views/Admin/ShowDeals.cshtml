@@ -1,27 +1,65 @@
-@model List<MvcPracownicy.Models.Deal>
+@model List<MvcPracownicy.Models.UserDealDisplayModel>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id umowy</th>
-            <th>Id użytkownika</th>
-            <th>Id oferty</th>
-            <th>Id adresu</th>
-            <th>Data zawarcia</th>
-            <th>Data zakończenia</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach(var deal in Model)
+@* Zmieniono model na nowy DTO *@
+
+@{
+    ViewData["Title"] = "Lista Umów";
+}
+
+
+<h1 class="display-5 text-dark mb-4">@ViewData["Title"]</h1>
+
+<div class="container my-4">
+    @* Wyświetlanie komunikatów sukcesu/błędu *@
+    @if (TempData["SuccessMessage"] != null)
     {
-        <tr>
-            <td>@deal.Id_umowy</td>
-            <td>@deal.Id_uzytkownika</td>
-            <td>@deal.Id_oferty</td>
-            <td>@deal.Id_adresu</td>
-            <td>@deal.Data_zawarcia.ToString("yyyy-MM-dd")</td>
-            <td>@(deal.Data_zakonczenia?.ToString("yyyy-MM-dd") ?? "-")</td>
-        </tr>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
-    </tbody>
-</table>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped table-hover shadow-sm rounded">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th scope="col">ID Umowy</th>
+                    <th scope="col">Login Użytkownika</th> @* Zmieniono na Login Użytkownika *@
+                    <th scope="col">Nazwa Oferty</th>
+                    <th scope="col">ID Adresu</th>
+                    <th scope="col">Data Zawarcia</th>
+                    <th scope="col">Data Zakończenia</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var deal in Model)
+                {
+                    <tr>
+                        <td>@deal.Id_umowy</td>
+                        <td>@deal.LoginUzytkownika</td> @* Wyświetla login użytkownika *@
+                        <td>@deal.NazwaOferty</td> @* Wyświetla nazwę oferty *@
+                        <td>@deal.Id_adresu</td>
+                        <td>@deal.Data_zawarcia.ToShortDateString()</td>
+                        <td>
+                            @(deal.Data_zakonczenia?.ToShortDateString() ?? "Aktywna")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info shadow-sm rounded-lg p-4" role="alert">
+            <p class="mb-0">Brak zarejestrowanych umów dla tego użytkownika.</p>
+        </div>
+    }
+</div>

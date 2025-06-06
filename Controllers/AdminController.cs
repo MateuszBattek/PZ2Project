@@ -134,7 +134,7 @@ public class AdminController : Controller
     {
         if (!HttpContext.Session.Keys.Contains("Rola") || HttpContext.Session.GetString("Rola") != "Admin")
             return RedirectToAction("LogIn", "Authentication");
-        return View(DBModel.GetDeals());
+        return View(DBModel.GetUserDealsDisplay());
     }
 
     public IActionResult ShowPayments()

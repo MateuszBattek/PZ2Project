@@ -318,54 +318,54 @@ public class DBModel
         return deals;
     }
 
-    public static List<Deal> GetUserDeals(int Id_uzytkownika)
+    public static List<UserDealDetails> GetUserDeals(int Id_uzytkownika)
     {
-        List<Deal> deals = new List<Deal>();
+        List<UserDealDetails> deals = new List<UserDealDetails>();
         using (var connection = new SqliteConnection(connectionString))
         {
             connection.Open();
             var selectCmd = connection.CreateCommand();
             selectCmd.CommandText = @"
-            SELECT Id_umowy, Id_oferty, Id_adresu, Data_zawarcia, Data_zakonczenia
-            FROM Umowy
-            WHERE Id_uzytkownika = @user_id
-        ";
+                    SELECT
+                        U.Id_umowy,
+                        O.Nazwa,            -- Nazwa oferty z tabeli Oferty
+                        U.Id_adresu,
+                        U.Data_zawarcia,
+                        U.Data_zakonczenia
+                    FROM Umowy U
+                    JOIN Oferty O ON U.Id_oferty = O.Id_oferty -- Połączenie z tabelą Oferty
+                    WHERE U.Id_uzytkownika = @user_id;
+                ";
             selectCmd.Parameters.AddWithValue("@user_id", Id_uzytkownika);
+
             using (var reader = selectCmd.ExecuteReader())
             {
                 while (reader.Read())
                 {
                     int id_umowy = reader.GetInt32(0);
-                    // int id_uzytkownika = reader.GetInt32(1); // To jest ID użytkownika, które już masz
-                    int id_oferty = reader.GetInt32(1); // Kolumna 1 to Id_oferty
-                    int id_adresu = reader.GetInt32(2); // Kolumna 2 to Id_adresu
+                    string nazwa_oferty = reader.GetString(1); // Nazwa oferty jest teraz na indeksie 1
+                    int id_adresu = reader.GetInt32(2);
+                    DateTime data_zawarcia = reader.GetDateTime(3);
 
-                    // Poprawne parsowanie dat
-                    DateTime data_zawarcia = reader.GetDateTime(3); // Jeśli to data, lepiej GetDateTime
-
-                    DateTime? data_zakonczenia = null; // Użyj DateTime? (Nullable DateTime)
-
-                    // Sprawdź, czy wartość w kolumnie Data_zakonczenia jest NULL w bazie
-                    if (!reader.IsDBNull(4)) // Sprawdź, czy kolumna o indeksie 4 (Data_zakonczenia) NIE jest NULL
+                    DateTime? data_zakonczenia = null;
+                    if (!reader.IsDBNull(4)) // Data_zakonczenia jest na indeksie 4
                     {
-                        data_zakonczenia = reader.GetDateTime(4); // Jeśli nie jest NULL, pobierz jako DateTime
+                        data_zakonczenia = reader.GetDateTime(4);
                     }
 
-                    // Utwórz obiekt Deal. Pamiętaj, że konstruktor Deal musi przyjmować DateTime?
-                    // Jeśli konstruktor Deal wymaga DateTime, zdecyduj, co ma być domyślną wartością dla NULL (np. DateTime.MinValue)
-                    Deal deal = new Deal(
-                        Id_uzytkownika,
-                        id_oferty,
-                        id_adresu,
-                        data_zawarcia,
-                        id_umowy,
-                        data_zakonczenia // Tutaj przekazujesz nullable DateTime?
-                    );
-                    deals.Add(deal);
+                    deals.Add(new UserDealDetails
+                    {
+                        Id_umowy = id_umowy,
+                        NazwaOferty = nazwa_oferty,
+                        Id_adresu = id_adresu,
+                        Data_zawarcia = data_zawarcia,
+                        Data_zakonczenia = data_zakonczenia,
+                        Id_uzytkownika = Id_uzytkownika // Ustawiamy ID użytkownika
+                    });
                 }
             }
         }
-        Console.WriteLine(deals);
+        // Console.WriteLine(deals); // To nadal wyświetli tylko typ listy
         return deals;
     }
 
@@ -395,8 +395,8 @@ public class DBModel
             connection.Open();
             var insertCmd = connection.CreateCommand();
             insertCmd.CommandText = @"
-            INSERT INTO Platnosci (Id_platnosci, Id_uzytkownika, Id_umowy, Kwota, Data)
-            VALUES (@id_platnosci, @id_uzytkownika, @id_umowy, @kwota, @data)
+            INSERT INTO Platnosci (Id_uzytkownika, Id_umowy, Kwota, Data)
+            VALUES (@id_uzytkownika, @id_umowy, @kwota, @data)
             ";
             insertCmd.Parameters.AddWithValue("@id_platnosci", payment.Id_platnosci);
             insertCmd.Parameters.AddWithValue("@id_uzytkownika", payment.Id_uzytkownika);
@@ -555,6 +555,45 @@ public class DBModel
         return payments;
     }
 
+    public static List<UserPaymentDetails> GetUserPayments(int id_uzytkownika)
+    {
+        List<UserPaymentDetails> payments = new List<UserPaymentDetails>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = @"
+                    SELECT
+                        P.Id_platnosci,
+                        P.Id_umowy,
+                        O.Nazwa,           -- Pobieramy nazwę oferty (nazwę umowy)
+                        P.Kwota,
+                        P.Data             -- Używam P.Data, tak jak w Twoim kodzie, upewnij się, że to nazwa kolumny
+                    FROM Platnosci P
+                    JOIN Umowy U ON P.Id_umowy = U.Id_umowy      -- Łączymy z Umowy, aby uzyskać Id_uzytkownika
+                    JOIN Oferty O ON U.Id_oferty = O.Id_oferty   -- Łączymy z Oferty, aby uzyskać nazwę oferty
+                    WHERE U.Id_uzytkownika = @user_id;
+                ";
+            selectCmd.Parameters.AddWithValue("@user_id", id_uzytkownika);
+
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    payments.Add(new UserPaymentDetails
+                    {
+                        Id_platnosci = reader.GetInt32(0),
+                        Id_umowy = reader.GetInt32(1),
+                        NazwaUmowy = reader.GetString(2),    // Nazwa umowy z O.Nazwa
+                        Kwota = reader.GetDecimal(3),       // Użyj GetDecimal dla kwot
+                        DataPlatnosci = reader.GetDateTime(4), // Użyj GetDateTime dla dat
+                        Id_uzytkownika = id_uzytkownika     // Przypisanie id_uzytkownika
+                    });
+                }
+            }
+        }
+        return payments;
+    }
 
 
     public static void AddDeal(Deal deal)
@@ -610,6 +649,85 @@ public class DBModel
             updateCmd.Parameters.AddWithValue("@id_umowy", deal_id);
             updateCmd.ExecuteNonQuery();
         }
+    }
+
+    /// <summary>
+    /// Zwraca listę wszystkich ofert (Id i Nazwa) z bazy danych.
+    /// </summary>
+    /// <returns>Lista obiektów OfferItem.</returns>
+    public static List<OfferItem> GetAllOffers()
+    {
+        List<OfferItem> offers = new List<OfferItem>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = "SELECT Id_oferty, Nazwa FROM Oferty ORDER BY Nazwa;";
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    offers.Add(new OfferItem
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1)
+                    });
+                }
+            }
+        }
+        return offers;
+    }
+
+    /// <summary>
+    /// Zwraca listę umów (dealów) dla użytkownika,
+    /// zawierającą nazwę oferty i login użytkownika.
+    /// </summary>
+    /// <param name="Id_uzytkownika">ID użytkownika, dla którego mają zostać pobrane umowy (opcjonalnie, jeśli chcesz pobrać tylko jego umowy).</param>
+    /// <returns>Lista obiektów UserDealDisplayModel.</returns>
+    public static List<UserDealDisplayModel> GetUserDealsDisplay()
+    {
+        List<UserDealDisplayModel> deals = new List<UserDealDisplayModel>();
+        using (var connection = new SqliteConnection(connectionString))
+        {
+            connection.Open();
+            var selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = @"
+                    SELECT
+                        U.Id_umowy,
+                        Uzyt.Login,          -- Login użytkownika
+                        O.Nazwa,             -- Nazwa oferty
+                        U.Id_adresu,
+                        U.Data_zawarcia,
+                        U.Data_zakonczenia
+                    FROM Umowy U
+                    JOIN Uzytkownicy Uzyt ON U.Id_uzytkownika = Uzyt.Id_uzytkownika -- Połączenie z tabelą Uzytkownicy
+                    JOIN Oferty O ON U.Id_oferty = O.Id_oferty;   -- Połączenie z tabelą Oferty
+                ";
+            // selectCmd.Parameters.AddWithValue("@user_id", Id_uzytkownika); // Nadal używamy parametru dla filtrowania
+
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    DateTime? data_zakonczenia = null;
+                    if (!reader.IsDBNull(5)) // Data_zakonczenia jest teraz na indeksie 5
+                    {
+                        data_zakonczenia = reader.GetDateTime(5);
+                    }
+
+                    deals.Add(new UserDealDisplayModel
+                    {
+                        Id_umowy = reader.GetInt32(0),
+                        LoginUzytkownika = reader.GetString(1), // Login na indeksie 1
+                        NazwaOferty = reader.GetString(2),      // Nazwa oferty na indeksie 2
+                        Id_adresu = reader.GetInt32(3),         // Id_adresu na indeksie 3
+                        Data_zawarcia = reader.GetDateTime(4),  // Data_zawarcia na indeksie 4
+                        Data_zakonczenia = data_zakonczenia
+                    });
+                }
+            }
+        }
+        return deals;
     }
 
 

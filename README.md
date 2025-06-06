@@ -30,18 +30,18 @@ zakładamy, że użytkownik nie zawiera sam umowy
 
 TODO:
 
-controller/widok dodawania/usuwania użytkownika (na jakiejś liście uzytkowników) 
-controller/widok dodawania/usuwania ofert (zeby były pola w formularzu na wpisanie danych i pod spodem wypisane oferty)
-zmienić logowanie żeby pasowało do naszej bazy
-controller/widok zmiany hasła/emailu/itd użytkownika
+controller/widok dodawania/usuwania użytkownika (na jakiejś liście uzytkowników) +
+controller/widok dodawania/usuwania ofert (zeby były pola w formularzu na wpisanie danych i pod spodem wypisane oferty) +
+zmienić logowanie żeby pasowało do naszej bazy + 
+controller/widok zmiany hasła/emailu/itd użytkownika + 
 controller/widok wpłata pieniędzy
 
 w modelu:
 dodawanie, usuwanie uzytkownika - gotowe
-zrobić funkcje zwracającą ile musi zapłacić użytkownik - w trakcie
-zrobić funkcje zwracającą użytkowników, krórzy nie zapłacili
+zrobić funkcje zwracającą ile musi zapłacić użytkownik - w trakcie +
+zrobić funkcje zwracającą użytkowników, krórzy nie zapłacili +
 zrobić funkcję wpłaty       // podajemy jako argument kto i ilość
-logowanie - gotowe
+logowanie - gotowe + 
 dodanie oferty
 zrobić klasy dla każdej tabeli z bazy - gotowe
 
